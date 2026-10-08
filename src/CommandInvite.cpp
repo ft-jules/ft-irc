@@ -28,8 +28,8 @@ void CommandInvite::execute(const std::string &args, Client *client)
 		return (Reply::sendNumReply(client, ERR_USERONCHANNEL, nickname, channelName));
 
 	channel->addInvite(invitee);
+	// the invitee gets the INVITE itself, the inviter only the 341 confirmation
 	std::string msg = client->get_mask() + " INVITE " + nickname + " :" + channelName;
-	Reply::sendReply(client, msg); // :nick!user@host INVITE invitee :#channel
-	Reply::sendNumReply(invitee, RPL_INVITING, channelName, nickname);
-	Reply::sendNumReply(client, RPL_INVITING, channelName, nickname); // optional
+	Reply::sendReply(invitee, msg); // :nick!user@host INVITE invitee :#channel
+	Reply::sendNumReply(client, RPL_INVITING, channelName, nickname);
 }

@@ -58,6 +58,9 @@ void Server::createServerSocket()
 	int opt = 1; // Set socket options
 	if (setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
 		throw std::runtime_error("setsockopt() failed");
+	// the listening socket too: accept() must never block the event loop
+	if (fcntl(_fd, F_SETFL, O_NONBLOCK) == -1)
+		throw std::runtime_error("fcntl() failed");
 }
 
 void Server::bindAndListen()

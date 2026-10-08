@@ -19,9 +19,11 @@ void	Client::parseDataClient()
 	char buffer[BUFFER_SIZE];
 	memset(buffer, 0, sizeof(buffer));
 	ssize_t bytes = recv(_fd, buffer, sizeof(buffer) - 1 , 0);
-	line += buffer;
-	if (line.empty() || bytes == -1)
+	// 0 means the client closed: drop it even if a partial line is still waiting,
+	// otherwise the socket stays readable and the event loop spins on it
+	if (bytes <= 0)
 		return Server::getInstance().removeClient(_fd);
+	line.append(buffer, bytes);
 	
 	// check if in list
 	if (Server::getInstance().isClient(_nickname) == false || _isDead)
